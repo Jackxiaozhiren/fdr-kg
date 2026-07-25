@@ -24,7 +24,6 @@
 - figures/graphical_abstract.pdf: Graphical Abstract
 - references.bib: Bibliography (60 entries, 59 with DOI)
 - manuscript.pdf: Compiled manuscript (42 pages, 998 KB)
-- build.sh: LaTeX build script
 
 ## Cover Letter
 - cover_letter.pdf: Submission cover letter (generated from cover_letter.tex)
