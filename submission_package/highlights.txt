@@ -1,0 +1,7 @@
+# Highlights
+
+- KG link prediction reformulated as large-scale multiple hypothesis testing
+- Empirical p-values from embedding scores enable per-prediction FDR control
+- 26--85% of test triples are statistically indistinguishable from noise
+- Per-relation FDR rates span 9.1%--96.5%, exposing heterogeneity invisible to MRR
+- MRR and FDR produce conflicting model rankings across both benchmark datasets

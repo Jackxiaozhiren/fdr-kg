@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Data files (too large for Git)
+*.npy
+*.pth
+*.pt
+checkpoints/
+data/
+
+# Environment
+.env
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LaTeX artifacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz
+submission_package/*.aux
+submission_package/*.log
+submission_package/*.out
+submission_package/*.bbl
+submission_package/*.blg

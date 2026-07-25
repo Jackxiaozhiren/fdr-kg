@@ -1,0 +1,57 @@
+\documentclass[review]{elsarticle}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{array}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\journal{Knowledge-Based Systems}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{FDR-Controlled Knowledge Graph Completion: Statistical Inference for Reliable Link Prediction}
+
+\author[1]{Zhiren Xiao\corref{corresponding}}
+\cortext[corresponding]{Corresponding author.}
+\address[1]{Guangdong University of Finance, Guangzhou, China}%
+\ead{241734106@m.gduf.edu.cn}
+
+\begin{abstract}
+Knowledge graph (KG) link prediction evaluation has relied on ranking-based metrics---MRR and Hits@$K$---that condense thousands of test triples into a single scalar. These aggregate measures reveal neither which individual predictions are statistically trustworthy nor what fraction of a model's output carries genuine knowledge signal.
+We reformulate KG completion evaluation as a large-scale multiple hypothesis testing problem, constructing empirical $p$-values from embedding scores via permutation-based negative sampling and applying Benjamini-Hochberg FDR control, Storey's $q$-value estimation, and Efron's local FDR to produce per-triple, per-relation, and per-model reliability profiles.
+Experiments on WN18RR and FB15k-237 with four models (TransE, RotatE, ComplEx, ConvE) yield three findings.
+First, the estimated null proportion $\hat{\pi}_0$ ranges from $0.259$ to $0.851$, indicating that 26--85\% of test triples are indistinguishable from noise depending on the model and benchmark.
+Second, per-relation FDR rejection rates span $9.1\%$--$96.5\%$ under a single model, exposing extreme heterogeneity invisible to aggregate metrics.
+Third, MRR and FDR produce conflicting model rankings---on WN18RR, ConvE trails TransE on MRR ($0.469$ vs.\ $0.560$) yet achieves $2.8\times$ the BH rejection rate at $\alpha = 0.05$; the ranking divergence persists on FB15k-237, while ComplEx yields zero statistically significant discoveries on both benchmarks.
+The framework operates as a post-hoc protocol requiring no model modification and completes in minutes on consumer hardware, providing per-prediction reliability guarantees directly relevant to high-stakes knowledge graph applications including drug repurposing and clinical decision support.
+\end{abstract}
+
+\begin{keyword}
+Knowledge graph completion \sep False discovery rate \sep Multiple hypothesis testing \sep Statistical evaluation \sep Link prediction reliability \sep Knowledge graph embedding
+\end{keyword}
+
+\end{frontmatter}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_methodology}
+\input{sections/04_experiments}
+\input{sections/04_sensitivity}
+\input{sections/05_conclusion}
+
+\section*{Acknowledgments}
+The author gratefully acknowledges the open-source KG embedding community, particularly the developers of PyKEEN, whose framework made these experiments possible. The author also thanks the reviewers for constructive feedback that improved the manuscript.
+
+\section*{Data Availability Statement}
+The WN18RR and FB15k-237 datasets used in this study are publicly available benchmark datasets. The complete source code, analysis scripts, trained model checkpoints, and per-relation FDR statistics are openly available at \texttt{https://github.com/Jackxiaozhiren/fdr-kg}. No new data were generated for this study. All experiments were conducted with random seed 42; re-running with the provided code and seed will reproduce the exact results reported in this paper.
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references/references}
+
+\end{document}

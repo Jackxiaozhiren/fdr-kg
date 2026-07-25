@@ -1,0 +1,12 @@
+relation_id,relation_name,TransE_p_below_005,RotatE_p_below_005,ComplEx_p_below_005,ConvE_p_below_005,n_triples
+0,/base/location/contains,0.421,0.538,0.042,0.387,342
+1,/base/people/occupation/people_with_this_occupation,0.312,0.445,0.018,0.289,287
+2,/base/geography/geographical_area/contains,0.178,0.234,0.008,0.156,256
+3,/base/people/person/nationality,0.084,0.156,0.003,0.072,223
+4,/base/people/person/place_of_birth,0.298,0.412,0.011,0.267,218
+5,/base/business/company/industry,0.123,0.178,0.007,0.098,195
+6,/base/location/country/capital,0.089,0.134,0.002,0.076,184
+7,/base/people/person/ethnicity,0.067,0.092,0.001,0.054,172
+8,/base/location/administrative_division/country,0.112,0.167,0.005,0.089,168
+9,/base/population/place_of_birth/people_born_here,0.234,0.345,0.009,0.198,165
+10,/base/location/adjoining_relationship/adjoins,0.843,0.812,0.156,0.798,42
