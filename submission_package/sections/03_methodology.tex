@@ -1,0 +1,233 @@
+\section{Methodology}
+\label{sec:method}
+
+We propose a statistical framework that reformulates knowledge graph completion evaluation as a large-scale multiple hypothesis testing problem. Our framework is model-agnostic: it operates on the output scores of any KG embedding model and provides false discovery rate (FDR) control for link prediction. We first formalize the problem~(\ref{subsec:formulation}), then develop empirical $p$-value construction from embedding scores~(\ref{subsec:pvalue}), introduce FDR control procedures~(\ref{subsec:bh}--\ref{subsec:locfdr}), and finally define the FDR-based evaluation protocol~(\ref{subsec:protocol}).
+
+\subsection{Problem Formulation: KG Completion as Multiple Hypothesis Testing}
+\label{subsec:formulation}
+
+Let $\mathcal{G} = (\mathcal{E}, \mathcal{R}, \mathcal{T})$ denote a knowledge graph, where $\mathcal{E}$ is the set of entities, $\mathcal{R}$ the set of relation types, and $\mathcal{T} \subseteq \mathcal{E} \times \mathcal{R} \times \mathcal{E}$ the set of observed triples.
+A KG embedding model learns a scoring function $\hat{g}: \mathcal{E} \times \mathcal{R} \times \mathcal{E} \to \mathbb{R}$ that assigns a real-valued plausibility score to each candidate triple.
+For a query $(h, r, ?)$, the model ranks all candidate tail entities by their scores; the standard evaluation protocol measures whether the ground-truth tail entity $t^*$ appears among the top-$K$ ranked candidates (Hits@$K$) and averages the reciprocal rank over all test queries (MRR).
+
+We propose to view this problem through the lens of \emph{multiple hypothesis testing}.
+Consider a test set $\mathcal{T}_{\text{test}} = \{(h_i, r_i, t^*_i)\}_{i=1}^{m}$ where $m = |\mathcal{T}_{\text{test}}|$.
+For each test triple $i$, we formulate a null hypothesis:
+\begin{equation}
+    H_0^{(i)}: \text{``The triple } (h_i, r_i, t^*_i) \text{ does not exist in the true KG.''}
+    \label{eq:null}
+\end{equation}
+Rejecting $H_0^{(i)}$ corresponds to the statistical decision that the model has ``discovered'' triple $i$---i.e., the observed embedding score for $(h_i, r_i, t^*_i)$ is significantly higher than what would be expected under the null distribution of non-existent triples.
+
+This formulation yields $m$ simultaneous hypothesis tests. Let $m_0$ be the number of true null hypotheses (triples that genuinely do not exist or are unpredictable), and let $\pi_0 = m_0 / m$ denote the proportion of null cases.
+Following the standard multiple testing framework~\cite{benjamini1995controlling, storey2002direct}, we define:
+\begin{itemize}
+    \item \textbf{False Discovery Proportion (FDP):} the fraction of rejected null hypotheses that are actually true.
+    \item \textbf{False Discovery Rate (FDR):} the expected value of FDP: $\text{FDR} = \mathbb{E}[\text{FDP}]$.
+\end{itemize}
+
+Our goal is to reject as many $H_0^{(i)}$ as possible (i.e., maximize statistical power) while controlling the FDR at a pre-specified level $\alpha$ (typically $\alpha = 0.05$).
+This transforms KG completion evaluation from a purely ranking-based paradigm into a statistically principled framework: instead of only asking ``how high does the true tail rank?'' (MRR), we also ask ``how many test triples can we reliably claim to have discovered?''
+
+\subsection{Empirical $p$-value Construction from Embedding Scores}
+\label{subsec:pvalue}
+
+The first technical challenge is that KG embedding scores are not probabilities---they are uncalibrated real numbers whose scale and distribution vary across models.
+We must convert each raw score into a valid $p$-value before applying any FDR control procedure.
+
+For each test triple $(h_i, r_i, t^*_i)$, we construct an empirical null distribution by sampling $K$ negative tail entities.
+Specifically, we:
+\begin{enumerate}
+    \item Sample $K$ candidate tail entities $\{t_1^{(i)}, \dots, t_K^{(i)}\}$ uniformly from $\mathcal{E}$, excluding the ground-truth tail $t^*_i$ and all tails known to form valid triples with $(h_i, r_i)$ in the training set (filtered setting).
+    \item Compute the model score for each negative triple: $s_{i,k} = \hat{g}(h_i, r_i, t^{(i)}_k)$, for $k = 1, \dots, K$.
+    \item Let $s_i^* = \hat{g}(h_i, r_i, t^*_i)$ denote the score of the true triple.
+    \item Define the empirical $p$-value as:
+    \begin{equation}
+        \hat{p}_i = \frac{|\{k : s_{i,k} \geq s_i^*\}| + 1}{K + 1}.
+        \label{eq:pvalue}
+    \end{equation}
+\end{enumerate}
+
+The $+1$ correction in both numerator and denominator ensures that (i) $\hat{p}_i > 0$ for all $i$, avoiding degenerate cases in subsequent FDR procedures, and (ii) the estimator is conservative, i.e., $\mathbb{E}[\hat{p}_i] \geq \Pr_{H_0}(S \geq s_i^*)$, providing valid (though slightly conservative) inference under the null~\cite{davison1997bootstrap}.
+
+The choice $K = 100$ balances precision against computational cost. With $K = 100$, the smallest attainable $p$-value is $1/(K+1) \approx 0.0099$, which provides sufficient granularity for FDR control at conventional $\alpha$ levels ($0.01$--$0.20$).
+On an Apple M1 CPU (16\,GB RAM), the full FDR pipeline completes in approximately 3--5 minutes per model on WN18RR ($m = 2{,}924$) and 25--35 minutes on FB15k-237 ($m = 20{,}438$).
+For comparison, model training requires 15--25 minutes (20 epochs), so the FDR pipeline adds roughly 15--20\% overhead relative to training---modest given that it requires no model modification or retraining.
+This represents roughly 15--20\% overhead relative to training, which is modest given that the FDR framework requires no model modification or retraining.
+
+\subsection{False Discovery Rate Control}
+\label{subsec:bh}
+
+\subsubsection{Benjamini-Hochberg Procedure}
+\label{subsec:bh-procedure}
+
+The Benjamini-Hochberg (BH) procedure~\cite{benjamini1995controlling} provides finite-sample FDR control under mild dependence assumptions.
+Given $m$ $p$-values $\{\hat{p}_1, \dots, \hat{p}_m\}$ and a target FDR level $\alpha$, the BH procedure operates as follows:
+\begin{enumerate}
+    \item Sort the $p$-values in ascending order: $\hat{p}_{(1)} \leq \hat{p}_{(2)} \leq \cdots \leq \hat{p}_{(m)}$.
+    \item Find the largest index $k$ such that $\hat{p}_{(k)} \leq \frac{k}{m} \cdot \alpha$.
+    \item Reject all $H_0^{(i)}$ corresponding to $\hat{p}_{(1)}, \dots, \hat{p}_{(k)}$.
+\end{enumerate}
+
+The BH theorem guarantees that $\text{FDR} \leq \frac{m_0}{m} \cdot \alpha \leq \alpha$ when the $p$-values are independent or exhibit positive regression dependency on the subset of true null hypotheses (PRDS)~\cite{benjamini2001control}.
+Although the negative tail entities are sampled independently for each test triple, the resulting $p$-values share dependence through the trained entity embeddings: the embedding vector of an entity affects scores for all test triples in which it appears.
+If two test triples share entities, changes to the shared embedding affect both scores in the same direction, creating positive dependence consistent with the PRDS condition.
+A formal verification for general KG embedding architectures is deferred to future theoretical work.
+
+The number of rejected hypotheses, $R(\alpha) = |\{i: \hat{p}_i \leq \hat{p}_{(k)}\}|$, serves as a measure of the model's \emph{statistical power}---the number of test triples that can be reliably distinguished from noise at FDR level $\alpha$.
+
+\subsubsection{Storey's $q$-value}
+\label{subsec:qvalue}
+
+While the BH procedure provides a binary reject/accept decision at a fixed $\alpha$, Storey's $q$-value~\cite{storey2002direct, storey2003statistical} offers a more fine-grained measure.
+The $q$-value of a hypothesis $H_0^{(i)}$ is defined as the minimum FDR at which $H_0^{(i)}$ would be rejected:
+\begin{equation}
+    q(\hat{p}_i) = \min_{\alpha \geq \hat{p}_i} \text{FDR}(\alpha).
+\end{equation}
+
+A key component of Storey's method is the estimation of $\pi_0 = m_0 / m$, the proportion of true null hypotheses.
+For a tuning parameter $\lambda \in (0, 1)$, an unbiased estimator is:
+\begin{equation}
+    \hat{\pi}_0(\lambda) = \frac{|\{i : \hat{p}_i > \lambda\}|}{m \cdot (1 - \lambda)}.
+    \label{eq:pi0}
+\end{equation}
+The final $\hat{\pi}_0$ is obtained by smoothing over a grid of $\lambda$ values using a cubic spline and taking the limit as $\lambda \to 1$~\cite{storey2002direct}.
+The $q$-value for the $i$-th hypothesis is then computed as:
+\begin{equation}
+    q_{(m)} = \hat{\pi}_0 \cdot \hat{p}_{(m)}, \qquad
+    q_{(i)} = \min\left(\hat{\pi}_0 \cdot \frac{m}{i} \cdot \hat{p}_{(i)}, \; q_{(i+1)}\right), \quad i = m-1, \dots, 1.
+\end{equation}
+
+In our KG completion context, $\hat{\pi}_0$ has a direct interpretation: it estimates the proportion of test triples for which the embedding model provides no signal above the background noise level.
+A small $\hat{\pi}_0$ indicates that the model captures genuine knowledge for most test triples; a large $\hat{\pi}_0$ reveals that a substantial fraction of the test set is indistinguishable from random noise.
+
+\subsection{Empirical Bayes Local False Discovery Rate}
+\label{subsec:locfdr}
+
+While $\hat{\pi}_0$ and $q$-values provide global and per-hypothesis FDR control, Efron's empirical Bayes local FDR~\cite{efron2004large, efron2007size} offers a complementary perspective by estimating the posterior probability that a specific hypothesis is null \emph{given its observed test statistic}.
+
+We first transform each $p$-value to a $z$-score using the inverse normal cumulative distribution function:
+\begin{equation}
+    z_i = \Phi^{-1}(1 - \hat{p}_i),
+    \label{eq:zscore}
+\end{equation}
+where $\Phi^{-1}$ is the standard normal quantile function. Under the null hypothesis $H_0^{(i)}$, we have $z_i \sim \mathcal{N}(0, 1)$; under the alternative, the $z$-scores are shifted toward positive values.
+
+The mixture density of $z$-scores can be expressed as:
+\begin{equation}
+    f(z) = \pi_0 \cdot f_0(z) + (1 - \pi_0) \cdot f_1(z),
+    \label{eq:mixture}
+\end{equation}
+where $f_0(z) = \phi(z)$ is the standard normal density (null component) and $f_1(z)$ is the alternative density.
+The local FDR is then defined as the posterior probability:
+\begin{equation}
+    \text{fdr}(z) = \frac{\pi_0 \cdot f_0(z)}{f(z)}.
+    \label{eq:locfdr}
+\end{equation}
+
+In practice, we estimate $f(z)$ via kernel density estimation on the observed $\{z_i\}_{i=1}^m$, compute $\hat{\pi}_0$ using Storey's method, and evaluate $\text{fdr}(z_i)$ at each observed $z$-score.
+A triple with $\text{fdr}(z_i) \leq 0.05$ has at most a 5\% posterior probability of being a false discovery---a calibration guarantee that point estimates like MRR cannot provide.
+
+The three FDR measures are complementary:
+\begin{itemize}
+    \item \textbf{BH rejection count} $R(\alpha)$: how many discoveries at a guaranteed FDR level.
+    \item \textbf{Storey's $\hat{\pi}_0$}: what fraction of test triples are noise---a model-level diagnostic.
+    \item \textbf{Local FDR}: per-triple reliability---which specific triples are confidently predicted.
+\end{itemize}
+
+\subsection{FDR-Based KG Completion Evaluation Protocol}
+\label{subsec:protocol}
+
+Building on the above statistical machinery, we define a three-level evaluation protocol that complements (not replaces) the standard MRR/Hits@$K$ metrics.
+
+\subsubsection{Level 1: Global Diagnostic}
+For a given KG embedding model on a test set, compute:
+\begin{itemize}
+    \item $\hat{\pi}_0$ (Eq.~\ref{eq:pi0}): the estimated proportion of unpredictable test triples.
+    \item $R(\alpha)$ for $\alpha \in \{0.01, 0.05, 0.10, 0.20\}$: the number of statistically significant discoveries at each FDR level.
+\end{itemize}
+
+These metrics reveal the overall reliability of the model's predictions.
+For illustration, on WN18RR with TransE, we obtain $\hat{\pi}_0 = 0.295$, meaning approximately 29.5\% of the 2,924 test triples are indistinguishable from noise.
+At $\alpha = 0.05$, only $R(0.05) = 262$ triples (9.0\%) are rejected despite an MRR of 0.560.
+This notable gap---a model that ranks well yet fails to reliably discover most triples---illustrates the value of FDR-based evaluation.
+
+\subsubsection{Level 2: Relation-Stratified Analysis}
+KG relations vary widely in their predictability. We propose to compute $\hat{\pi}_0^{(r)}$ and $R^{(r)}(\alpha)$ for each relation type $r \in \mathcal{R}$ separately.
+This stratified analysis reveals which relations the model ``truly understands'' versus those where it performs near random.
+
+Continuing the WN18RR example: for TransE, two relations with similar test-set sizes exhibit dramatically different FDR profiles:
+\begin{itemize}
+    \item Relation~1 ($n=1074$): $\hat{\pi}_0 = 0.061$, FDR rejection rate 92.7\%---the model reliably discovers nearly all triples.
+    \item Relation~3 ($n=1067$): $\hat{\pi}_0 = 0.388$, FDR rejection rate 27.6\%---less than a third of triples are statistically significant, despite comprising 36.5\% of the test set.
+\end{itemize}
+Traditional MRR would average these two relations into a single number, completely masking this extreme heterogeneity.
+
+\subsubsection{Level 3: Cross-Model FDR Comparison}
+For two (or more) KG embedding models, we compare their FDR profiles at each level.
+This reveals whether the standard MRR-based model ranking aligns with the FDR-based reliability ranking.
+If Model~A has a higher MRR but Model~B rejects more hypotheses at the same FDR level, this signals that MRR alone provides an incomplete picture of model quality.
+
+\subsection{Relationship to Existing Evaluation}
+\label{subsec:relationship}
+
+Our FDR-based protocol does not replace MRR or Hits@$K$; rather, it augments them with a complementary dimension of information.
+MRR and Hits@$K$ measure \emph{ranking quality}: when the model makes predictions, how often is the correct answer near the top?
+Our FDR framework measures \emph{statistical reliability}: for which test triples, and for what proportion of the test set, can we confidently claim the model has made a discovery beyond random chance?
+
+The two perspectives are complementary and together provide a richer characterization:
+
+\begin{center}
+\begin{tabular}{p{0.45\textwidth} p{0.45\textwidth}}
+\toprule
+\textbf{MRR / Hits@$K$ (Traditional)} & \textbf{FDR Framework (This Work)} \\
+\midrule
+Measures average rank of correct answers & Measures statistical significance of discoveries \\
+Single scalar per model & Multi-level: global + per-relation + per-triple \\
+Insensitive to per-relation variation & Reveals extreme heterogeneity across relations \\
+Ranking-based; no statistical guarantees & Provides FDR control and posterior error probabilities \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A complete KG completion evaluation should report both---the ranking metrics that have driven progress in the field, and the FDR metrics that reveal \emph{how reliable} those rankings truly are.
+
+\begin{algorithm}[t]
+\caption{FDR-Based KG Completion Evaluation Protocol}
+\label{alg:fdr-kg}
+\begin{algorithmic}[1]
+\Require Trained KG embedding model with scoring function $\hat{g}$;
+         Test set $\mathcal{T}_{\text{test}} = \{(h_i, r_i, t^*_i)\}_{i=1}^m$;
+         Entity set $\mathcal{E}$; number of negative samples $K$; FDR level $\alpha$
+\Ensure $p$-values $\{\hat{p}_i\}_{i=1}^m$; BH rejections $R(\alpha)$; Storey $\hat{\pi}_0$, $q$-values; local FDR
+
+\State \textbf{// Phase 1: $p$-value construction}
+\For{$i = 1$ \textbf{to} $m$}
+    \State Sample $K$ negative tails $\{t_k^{(i)}\}_{k=1}^K \subset \mathcal{E}$ (filtered)
+    \State Compute $s_i^* = \hat{g}(h_i, r_i, t^*_i)$ \Comment{True triple score}
+    \For{$k = 1$ \textbf{to} $K$}
+        \State Compute $s_{i,k} = \hat{g}(h_i, r_i, t^{(i)}_k)$ \Comment{Negative triple score}
+    \EndFor
+    \State $\hat{p}_i \gets \frac{|\{k: s_{i,k} \geq s_i^*\}| + 1}{K + 1}$ \Comment{Eq.~\ref{eq:pvalue}}
+\EndFor
+
+\State \textbf{// Phase 2: Benjamini-Hochberg FDR control}
+\State Sort $\{\hat{p}_i\}_{i=1}^m$ ascending: $\hat{p}_{(1)} \leq \cdots \leq \hat{p}_{(m)}$
+\State $k^* \gets \max\{k: \hat{p}_{(k)} \leq \frac{k}{m} \cdot \alpha\}$
+\State $R(\alpha) \gets k^*$ \Comment{Number of discoveries at FDR level $\alpha$}
+
+\State \textbf{// Phase 3: Storey's $q$-value and $\hat{\pi}_0$ estimation}
+\For{$\lambda \in \Lambda$} \Comment{Grid of tuning parameters, e.g., $\Lambda = \{0.1, \dots, 0.9\}$}
+    \State $\hat{\pi}_0(\lambda) \gets \frac{|\{i: \hat{p}_i > \lambda\}|}{m \cdot (1-\lambda)}$ \Comment{Eq.~\ref{eq:pi0}}
+\EndFor
+\State $\hat{\pi}_0 \gets \text{smooth}\{\hat{\pi}_0(\lambda)\}_{\lambda \to 1}$ \Comment{Cubic spline extrapolation}
+\State Compute $q$-values from $\{\hat{p}_i\}$ and $\hat{\pi}_0$
+
+\State \textbf{// Phase 4: Efron's local FDR}
+\State $z_i \gets \Phi^{-1}(1 - \hat{p}_i)$ for all $i$ \Comment{Eq.~\ref{eq:zscore}}
+\State Estimate mixture density $f(z)$ via kernel density estimation
+\State $\text{fdr}(z_i) \gets \frac{\hat{\pi}_0 \cdot \phi(z_i)}{f(z_i)}$ for all $i$ \Comment{Eq.~\ref{eq:locfdr}}
+
+\State \textbf{return} $\{\hat{p}_i\}, R(\alpha), \hat{\pi}_0, \{q_i\}, \{\text{fdr}(z_i)\}$
+\end{algorithmic}
+\end{algorithm}

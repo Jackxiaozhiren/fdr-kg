@@ -1,0 +1,66 @@
+{
+  "TransE": {
+    "m": 20438,
+    "pi0_spline": 0.716,
+    "pi0_storey": 0.734,
+    "bh_rejected": 1289,
+    "by_rejected": 716,
+    "locfdr_below_005": 7146,
+    "bh_rejection_rate": 0.063,
+    "mrr": 0.340,
+    "rejections_by_alpha": {
+      "0.01": 423,
+      "0.05": 1289,
+      "0.10": 2146,
+      "0.20": 3678
+    }
+  },
+  "RotatE": {
+    "m": 20438,
+    "pi0_spline": 0.685,
+    "pi0_storey": 0.701,
+    "bh_rejected": 1567,
+    "by_rejected": 889,
+    "locfdr_below_005": 7792,
+    "bh_rejection_rate": 0.077,
+    "mrr": 0.354,
+    "rejections_by_alpha": {
+      "0.01": 498,
+      "0.05": 1567,
+      "0.10": 2574,
+      "0.20": 4356
+    }
+  },
+  "ComplEx": {
+    "m": 20438,
+    "pi0_spline": 0.851,
+    "pi0_storey": 0.862,
+    "bh_rejected": 0,
+    "by_rejected": 0,
+    "locfdr_below_005": 94,
+    "bh_rejection_rate": 0.0,
+    "mrr": 0.215,
+    "rejections_by_alpha": {
+      "0.01": 0,
+      "0.05": 0,
+      "0.10": 0,
+      "0.20": 2
+    }
+  },
+  "ConvE": {
+    "m": 20438,
+    "pi0_spline": 0.721,
+    "pi0_storey": 0.738,
+    "bh_rejected": 1422,
+    "by_rejected": 801,
+    "locfdr_below_005": 7204,
+    "bh_rejection_rate": 0.070,
+    "mrr": 0.334,
+    "rejections_by_alpha": {
+      "0.01": 467,
+      "0.05": 1422,
+      "0.10": 2389,
+      "0.20": 4012
+    }
+  }
+}

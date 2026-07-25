@@ -1,0 +1,23 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced a false discovery rate (FDR) control framework for the evaluation of knowledge graph completion models.
+By recasting link prediction as a large-scale multiple hypothesis testing problem, the framework provides principled statistical confidence measures for individual predictions---a dimension of evaluation that the standard MRR/Hits@$K$ paradigm leaves unaddressed.
+
+Experiments on WN18RR and FB15k-237 with TransE, RotatE, ComplEx, and ConvE yielded three findings relevant to the KG completion community.
+First, the estimated null proportion ranges from $\hat{\pi}_0 = 0.259$ (RotatE, WN18RR) to $0.851$ (ComplEx, FB15k-237), indicating that the fraction of test triples indistinguishable from noise varies widely across models and benchmarks: on the larger FB15k-237 benchmark, even the best model (RotatE) has $\hat{\pi}_0 = 0.582$, meaning the majority of test triples carry no detectable signal.
+Second, per-relation FDR rejection rates exhibit extreme dispersion---from below $10\%$ to above $95\%$ on WN18RR, and from $0.8\%$ to $84.3\%$ across 237 FB15k-237 relations---and this heterogeneity persists across model architectures, consistent with the existence of ``knowledge blind spots'' that resist embedding-based prediction.
+Third, MRR and FDR produce conflicting model rankings: on WN18RR, ConvE trails TransE on MRR ($0.469$ vs.\ $0.560$) yet achieves $2.8\times$ the BH rejection rate; the ranking divergence generalizes to FB15k-237 where the FDR ordering (RotatE $>$ TransE $>$ ConvE $>$ ComplEx) disagrees with the MRR ordering (RotatE $>$ ConvE $>$ TransE $>$ ComplEx).
+
+These findings call into question the assumption that a single ranking metric adequately characterizes model quality.
+Our results suggest that the KG completion community would benefit from adopting FDR-based diagnostics alongside MRR and Hits@$K$ as a standard component of model evaluation.
+At minimum, we recommend reporting $\hat{\pi}_0$ and BH rejection counts at $\alpha = 0.05$, which together quantify the proportion of unpredictable test triples and the absolute number of statistically reliable discoveries---information that ranking metrics alone cannot supply.
+The practical significance extends beyond benchmarking: for knowledge-based applications that consume KG completion output---drug repurposing, clinical decision support, financial risk monitoring---knowing which predictions are statistically reliable directly informs resource allocation.
+
+The framework is compatible with major embedding paradigms, operates as a post-hoc protocol requiring no model modification, and completes in minutes on consumer hardware.
+We have released the complete source code, trained model checkpoints, and per-relation FDR statistics to facilitate community adoption.
+
+Several limitations warrant further investigation.
+The effect of dependence among $p$-values on FDR control guarantees, while partially addressed through the Benjamini-Yekutieli procedure (see Sensitivity Analysis, \S\ref{subsec:sensitivity}), merits formal theoretical analysis for general KG embedding architectures.
+The current results are reported from single training runs; multi-seed evaluation would quantify the variance of FDR metrics and strengthen the reliability of comparative conclusions.
+Extending the analysis to larger benchmarks (YAGO3-10, Wikidata5M), additional model families (GNN-based, hyperbolic, LLM-enhanced), and real-world deployment case studies would further establish the generality and practical impact of FDR-based KG evaluation.

@@ -20,7 +20,6 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fdr_kg.pipeline import run_fdr_pipeline, FDRConfig, rejections_at_alpha
-from fdr_kg.fdr_methods import storey_pi0_spline
 from fdr_kg.utils import aggregate_per_relation
 
 
