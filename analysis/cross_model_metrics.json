@@ -1,0 +1,42 @@
+{
+  "WN18RR/TransE": {
+    "pi0": 0.2825,
+    "n_fdr_005": 1447,
+    "fdr_rate_005": 0.4949,
+    "n_qval_005": 1884,
+    "n_locfdr_005": 1447,
+    "mrr": 0.5113,
+    "k_actual": 100,
+    "n_test": 2924
+  },
+  "WN18RR/RotatE": {
+    "pi0": 0.2585,
+    "n_fdr_005": 1100,
+    "fdr_rate_005": 0.3762,
+    "n_qval_005": 2050,
+    "n_locfdr_005": 1685,
+    "mrr": 0.5889,
+    "k_actual": 100,
+    "n_test": 2924
+  },
+  "WN18RR/ComplEx": {
+    "pi0": 0.7538,
+    "n_fdr_005": 0,
+    "fdr_rate_005": 0.0,
+    "n_qval_005": 0,
+    "n_locfdr_005": 20,
+    "mrr": 0.0738,
+    "k_actual": 100,
+    "n_test": 2924
+  },
+  "WN18RR/ConvE": {
+    "pi0": 0.3215,
+    "n_fdr_005": 742,
+    "fdr_rate_005": 0.2538,
+    "n_qval_005": 1705,
+    "n_locfdr_005": 1328,
+    "mrr": 0.4694,
+    "k_actual": 100,
+    "n_test": 2924
+  }
+}

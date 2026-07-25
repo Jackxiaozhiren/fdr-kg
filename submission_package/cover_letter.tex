@@ -1,0 +1,45 @@
+\documentclass{letter}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+\signature{Zhiren Xiao}
+\address{Guangdong University of Finance \\ Guangzhou, China \\ 241734106@m.gduf.edu.cn}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief \\
+Knowledge-Based Systems \\
+Elsevier}
+
+\opening{Dear Editor-in-Chief,}
+
+I am pleased to submit my manuscript entitled ``Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction'' for consideration for publication in Knowledge-Based Systems.
+
+\textbf{Innovation and Significance.}
+This work introduces a false discovery rate (FDR) control framework that reformulates knowledge graph (KG) link prediction evaluation as a large-scale multiple hypothesis testing problem. While KG embedding models have been studied for over a decade, no existing evaluation protocol quantifies which individual predictions are statistically distinguishable from random noise---nor what fraction of a model's output carries genuine knowledge signal. We fill this gap by constructing empirical $p$-values from embedding scores via permutation-based negative sampling, then applying Benjamini-Hochberg FDR control, Storey's $q$-value estimation, and Efron's empirical Bayes local FDR. The resulting three-level evaluation protocol produces per-triple, per-relation, and per-model reliability profiles that complement---rather than replace---existing ranking metrics. The framework is compatible with major embedding paradigms and computationally accessible: the full pipeline completes in 3--5 minutes per model on consumer hardware.
+
+\textbf{Fit with Knowledge-Based Systems.}
+This manuscript directly aligns with KBS's focus on knowledge-driven methodologies. The framework addresses a core problem in knowledge engineering: determining which KG completion predictions can be trusted as reliable knowledge for downstream knowledge-based systems. The FDR-based evaluation protocol serves as a diagnostic instrument that reveals what fraction of a KG embedding model's predictions carry genuine knowledge signal---information critical for applications such as clinical decision support, drug repurposing, and financial risk monitoring. This work bridges statistical methodology and knowledge representation, contributing to the principled construction and evaluation of knowledge-based systems.
+
+The contribution is situated within an active line of KBS publications on knowledge graph embedding and evaluation. Recent KBS papers have advanced KG completion through novel model architectures~\cite{fang2025knowledge,shang2024learnable,lu2024deep}, embedding quality assessment~\cite{purohit2025vanilla}, and knowledge-driven methodologies~\cite{le2023knowledge,zhang2023conflict}. Our framework extends this line of work by introducing statistical quality assurance---a dimension complementary to architectural innovation that directly serves the reliability needs of deployed knowledge-based systems. The paper also resonates with KBS publications on uncertainty and reliability in knowledge-driven applications, where principled quantification of prediction confidence is increasingly recognized as essential.
+
+\textbf{Key Findings.}
+Experiments on WN18RR and FB15k-237 across four model architectures (TransE, RotatE, ComplEx, ConvE) reveal that: (1) the estimated null proportion $\hat{\pi}_0$ ranges from 0.259 (RotatE, WN18RR) to 0.851 (ComplEx, FB15k-237), indicating that 26--85\% of test triples are statistically indistinguishable from noise, (2) per-relation discovery rates span from below $10\%$ to above $95\%$ under a single model, exposing extreme heterogeneity in prediction reliability that aggregate metrics cannot characterize, and (3) the rankings produced by MRR and FDR capture distinct dimensions of model quality---RotatE leads on MRR yet TransE leads on FDR power, confirming that model selection for knowledge-based system deployment benefits from multi-dimensional evaluation. These findings are validated through sensitivity analyses ($K \in \{25, 50, 100\}$, $\lambda \in \{0.3, 0.5, 0.7\}$) and a diagnostic decomposition of the FDR component stack (BH, Storey $q$-values, Efron local FDR).
+
+\textbf{Declarations.}
+\begin{itemize}
+    \item This manuscript has not been published previously and is not under consideration for publication elsewhere. All authors have approved its submission.
+    \item The author declares no competing financial interests or personal relationships that could have influenced this work.
+    \item A Data Availability Statement and CRediT Author Statement are included with the submission.
+    \item The complete source code, trained model checkpoints, and per-relation FDR statistics are publicly available at \texttt{https://github.com/Jackxiaozhiren/fdr-kg}. All experiments are reproducible with random seed 42.
+    \item Suggested reviewers are listed in the accompanying \texttt{referee\_suggestions.txt}.
+\end{itemize}
+
+I believe this work will be of significant interest to the KBS readership, particularly researchers working on knowledge graph construction, evaluation, and reliability assessment for knowledge-based applications. The framework is designed as a practical tool that researchers can adopt immediately, and we have released it as open-source software to facilitate community adoption.
+
+Thank you for your time and consideration.
+
+\closing{Sincerely,}
+
+\end{letter}
+\end{document}

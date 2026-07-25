@@ -1,8 +1,9 @@
 # KBS Submission Package — File Manifest
-# Paper: FDR-Controlled Knowledge Graph Completion: Statistical Inference for Reliable Link Prediction
+# Paper: Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction
 # Authors: Zhiren Xiao
 # Affiliation: Guangdong University of Finance, Guangzhou, China
 # Target Journal: Knowledge-Based Systems (Elsevier, SCI Q1)
+# Version: v2 (post desk-rejection revision)
 # Date: 2026-07-25
 
 ## Manuscript Files
@@ -22,28 +23,30 @@
 - figures/fb15k237_per_relation_summary.pdf: Figure 7 — FB15k-237 Per-Relation Summary
 - figures/fb15k237_per_relation_distribution.pdf: Figure 8 — FB15k-237 Per-Relation Distribution
 - figures/graphical_abstract.pdf: Graphical Abstract
-- references.bib: Bibliography (60 entries, 59 with DOI)
+- references.bib: Bibliography (55 entries)
 - manuscript.pdf: Compiled manuscript (42 pages, 998 KB)
 
 ## Cover Letter
-- cover_letter.pdf: Submission cover letter (generated from cover_letter.tex)
+- cover_letter.pdf: Submission cover letter
 
 ## Highlights
-- highlights.txt: 5 highlights, 72-82 characters each (all ≤85)
+- highlights.txt: 5 highlights, all ≤85 characters
 
 ## CRediT Author Statement
-- credit_author_statement.txt: CRediT roles — 11 roles by author, 3 marked Not Applicable
+- credit_author_statement.txt: CRediT roles
 
 ## Declaration of Competing Interest
-- declaration_of_competing_interest.docx: Competing interests declaration (standard Elsevier format)
+- declaration_of_competing_interest.docx: Competing interests declaration
 
 ## Supplementary Materials
-- supplementary_materials.pdf: Extended results, reproducibility details, per-relation FDR statistics
+- supplementary_materials.pdf: Extended results and reproducibility details
 
 ## Reviewer Suggestions
-- referee_suggestions.txt: 5 suggested reviewers with contact information and expertise
+- referee_suggestions.txt: 5 suggested reviewers
 
-## Final Verification (2026-07-25)
-- submission_package manuscript compiles from scratch: PASS (0 Errors, 0 undefined citations/references)
-- All 14 submission checklist items: PASS
-- ZIP integrity: 31 files, 1.5 MB
+## Final Verification (2026-07-26)
+- Build: PASS (0 errors, 12 warnings)
+- All 17 submission checklist items: PASS
+- Cover letter references genuine KBS papers: VERIFIED
+- Data consistency (C1-C5): ALL FIXED
+- Narrative: KBS-facing (statistical quality assurance for knowledge-based systems)
