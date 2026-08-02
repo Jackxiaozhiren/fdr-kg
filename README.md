@@ -1,40 +1,58 @@
 # FDR-KG: Statistical Quality Assurance for Knowledge Graph Link Prediction
 
-This repository contains the complete source code, configuration, and analysis scripts for:
+This repository hosts the FDR-KG framework and the source material for:
 
-> **Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction**  
-> Zhiren Xiao  
-> *Submitted to Knowledge-Based Systems (Elsevier)*
+> **Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction**
+> Zhiren Xiao
+> Submitted to **Expert Systems with Applications (Elsevier)**
+
+## Status note
+
+An earlier version of this study was previously submitted to *Knowledge-Based Systems* (Elsevier) and was not
+accepted; the journal flagged unintentional textual overlap. The manuscript has been systematically rewritten,
+the experimental protocol corrected, and the WN18RR evidence regenerated under a frozen, hash-verified protocol
+before being submitted to ESWA. Historical KBS-era materials are retained under `historical/` for audit only and
+do **not** reflect the current submission.
 
 ## Overview
 
-The FDR-KG framework reformulates knowledge graph (KG) link prediction evaluation as a large-scale multiple hypothesis testing problem, providing statistical quality assurance for knowledge-based systems that consume KG completion output. It constructs empirical p-values from embedding scores via permutation-based negative sampling, then applies Benjamini-Hochberg FDR control, Storey's q-value estimation, and Efron's local FDR in concert to produce per-triple, per-relation, and per-model reliability profiles.
+The FDR-KG framework formulates a **conditional benchmark diagnostic** for knowledge graph (KG) link prediction.
+For each retained test triple it samples $K$ filtered tail corruptions, compares the observed score with the
+sampled score distribution, and derives an empirical $p$-value that measures score extremeness under the declared
+candidate-tail sampling scheme. It then applies the standard largest-$k$ Benjamini–Hochberg rule and Storey's
+fixed-lambda $\hat\pi_0$ estimator as benchmark diagnostics. These quantities describe score behavior under the
+declared conditional scheme; they do not by themselves assert factual truth in a complete KG or provide
+unconditional validity or deployment guarantees.
 
-**Key findings:**
-- 26–85% of test triples are statistically indistinguishable from noise across models and benchmarks (estimated null proportion π̂₀ = 0.259 to 0.851)
-- Per-relation discovery rates span from below 10% to above 95% under a single model, exposing extreme heterogeneity in prediction reliability
-- Model rankings by MRR and by FDR power capture distinct dimensions of quality: RotatE leads on MRR while TransE leads on statistically significant discoveries
+**Accepted evidence (WN18RR, seed 42, 2,924 retained test triples, K=100):**
+
+| Model | Sampled MRR | $\hat\pi_0$ | BH rejections (rate) |
+|---|---|---|---|
+| RotatE | 0.5882 | 0.2510 | 1,751 (59.88%) |
+| ConvE (inverse-triple exception) | 0.5360 | 0.2770 | 1,527 (52.22%) |
+| TransE | 0.5077 | 0.2873 | 1,438 (49.18%) |
+| ComplEx | 0.0709 | 0.7503 | 0 (0.00%) |
+
+Sampled MRR and BH-rate rankings agree, with RotatE leading both. Multi-seed (42, 123, 456) BH-rate sample
+coefficients of variation are 0.54% (TransE), 0.39% (RotatE), and 1.09% (ConvE). Accepted sensitivity covers
+$K \in \{25,50,100\}$ and $\lambda \in \{0.3,0.5,0.7\}$ only. FB15k-237 historical results are not part of the
+accepted evidence and are quarantined.
 
 ## Repository Structure
 
-- `fdr_kg/` — Core Python package (p-value computation, FDR methods, pipeline)
-- `experiments/` — Run scripts, model configurations, and results
-- `analysis/` — Scripts to reproduce all tables and figures from the paper
-- `paper/` — LaTeX source files for the manuscript
-- `submission_package/` — Complete KBS submission materials (v2, 2026-07-26)
-
-## Quick Start
-
-```bash
-pip install -r requirements.txt
-python experiments/run_pipeline.py --dataset WN18RR --model TransE
-```
+- `fdr_kg/` — Core Python package (empirical p-value construction, BH, Storey, pipeline)
+- `experiments/`, `analysis/` — KBS-era run scripts, configurations, and analysis outputs
+- `historical/` — Superseded KBS-era manuscript and submission package (2026-07-26), kept for audit; contains
+  outdated numbers and must not be treated as the current submission
+- `requirements.txt`, `LICENSE`
 
 ## Reproducibility
 
-All main experiments use seed 42. Multi-seed stability analysis (seeds 42, 123, 456 across TransE, RotatE, ConvE) confirms coefficient of variation < 2% for BH rejection rate and < 6% for π̂₀, indicating that single-seed FDR comparisons are reliable.
-
-All models are trained with 20 epochs (embedding dimension d=256, learning rate 0.001, batch size 256) using the PyKEEN framework on a standard CPU (Apple M1, 16GB RAM). The full FDR pipeline completes in 3–35 minutes per model depending on dataset size.
+The numbers in the accepted manuscript were produced from frozen, hash-verified WN18RR artifacts (exports,
+candidate manifests, leakage audits, and the primary-number ledger) recorded in the submission's orchestration
+record. This repository implements the framework, but a generic checkout is **not claimed** to reproduce every
+reported number; exact reproduction requires the frozen protocol, recorded training and candidate seeds, and the
+corresponding verified artifacts.
 
 ## Citation
 
@@ -42,7 +60,7 @@ All models are trained with 20 epochs (embedding dimension d=256, learning rate 
 @article{xiao2026reliable,
   title={Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction},
   author={Xiao, Zhiren},
-  journal={Knowledge-Based Systems},
+  journal={Expert Systems with Applications},
   year={2026}
 }
 ```
