@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight scientific dependencies
+        run: python -m pip install --upgrade pip numpy scipy
+      - name: Compile package
+        run: python -m compileall -q fdr_kg analysis experiments
+      - name: Smoke-test FDR methods
+        run: |
+          python - <<'PY'
+          import numpy as np
+          from fdr_kg.fdr_methods import benjamini_hochberg, storey_qvalues
+          p = np.array([0.001, 0.01, 0.2, 0.8])
+          rejected, n = benjamini_hochberg(p, alpha=0.05)
+          q, pi0 = storey_qvalues(p, lambda_param=0.5)
+          assert n >= 1
+          assert rejected.shape == p.shape
+          assert q.shape == p.shape
+          assert 0.0 <= pi0 <= 1.0
+          print('FDR-KG smoke test passed')
+          PY

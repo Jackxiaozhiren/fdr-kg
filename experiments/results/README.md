@@ -1,49 +1,22 @@
-# FDR-KG Experimental Results
+# Public Benchmark Outputs
 
-**Important**: The `.npy` score files (positive_scores_K*.npy, negative_scores_K*.npy) required to run the FDR pipeline from scratch are not included in this repository due to file size limits. To reproduce the results:
+The files in this directory are retained public outputs from an earlier experiment state of FDR-KG.
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Train models and generate scores using PyKEEN, or
-3. Download pre-computed score files from the [GitHub Release](https://github.com/Jackxiaozhiren/fdr-kg/releases)
+## Important status
 
-The `fdr_summary.json` files in the WN18RR and FB15k-237 directories contain the pre-computed FDR results used in the paper. The `per_relation_fdr_full.csv` contains per-relation statistics for FB15k-237.
+These files are **not designated as the frozen evidence package for the current manuscript**. In particular, values in these JSON/CSV files may differ from the manuscript-facing evidence generated later under a corrected, frozen, hash-verified protocol.
 
-## Directory Structure
+Do not cite these files as the manuscript's headline results unless a versioned release explicitly states that they are the manuscript evidence package.
 
-```
-results/
-├── WN18RR/
-│   ├── fdr_summary.json     ← Pre-computed FDR results (Table 1)
-│   ├── TransE/               ← Score files (available on request)
-│   ├── RotatE/
-│   ├── ComplEx/
-│   └── ConvE/
-├── FB15k-237/
-│   ├── fdr_summary.json     ← Pre-computed FDR results (Table 3)
-│   ├── per_relation_fdr_full.csv
-│   ├── TransE/               ← Score files (available on request)
-│   ├── RotatE/
-│   ├── ComplEx/
-│   └── ConvE/
-└── multi_seed/               ← Multi-seed stability data
-```
+## Intended use
 
-## Results Summary
+They remain useful for:
 
-### WN18RR (2,924 test triples, K=100)
+- inspecting the public result schema;
+- exercising analysis code;
+- testing downstream parsers and visualizations;
+- understanding earlier benchmark behavior.
 
-| Model | pi0_spline | BH R(0.05) | BY R(0.05) | locFDR<0.05 | MRR |
-|-------|:----------:|:----------:|:----------:|:-----------:|:---:|
-| TransE | 0.494 | 263 | 153 | 1124 | 0.560 |
-| RotatE | 0.259 | 1100 | 748 | 1960 | 0.601 |
-| ComplEx | 0.754 | 0 | 0 | 20 | 0.274 |
-| ConvE | 0.452 | 738 | 462 | 1540 | 0.469 |
+## Manuscript reproduction
 
-### FB15k-237 (20,438 test triples, K=100)
-
-| Model | pi0_spline | BH R(0.05) | BY R(0.05) | locFDR<0.05 | MRR |
-|-------|:----------:|:----------:|:----------:|:-----------:|:---:|
-| TransE | 0.716 | 1289 | 716 | 7146 | 0.340 |
-| RotatE | 0.685 | 1567 | 889 | 7792 | 0.354 |
-| ComplEx | 0.851 | 0 | 0 | 94 | 0.215 |
-| ConvE | 0.721 | 1422 | 801 | 7204 | 0.334 |
+The manuscript archival release should contain or reference the exact frozen inputs, configurations, seeds, model artifacts, derived result ledger, and checksums required to verify the submitted tables and figures. See `../../docs/REPRODUCIBILITY.md` and `../../docs/DATA_AVAILABILITY.md`.
