@@ -1,7 +1,0 @@
-# Highlights
-
-- Knowledge graph link prediction evaluation reformulated as statistical quality assurance for knowledge-based systems
-- Empirical p-values from embedding scores enable per-prediction false discovery rate control
-- 26--85% of test triples are statistically indistinguishable from noise across models and benchmarks
-- Per-relation discovery rates span from below 10% to above 95%, exposing extreme heterogeneity in prediction reliability
-- MRR and FDR capture distinct dimensions of model quality, producing complementary rankings

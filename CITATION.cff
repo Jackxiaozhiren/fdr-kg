@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use FDR-KG, please cite this software release and, once published, the associated article."
+title: "FDR-KG: Statistical Quality Assurance for Knowledge Graph Link Prediction"
+type: software
+version: 1.0.0
+authors:
+  - family-names: Xiao
+    given-names: Zhiren
+repository-code: "https://github.com/Jackxiaozhiren/fdr-kg"
+url: "https://github.com/Jackxiaozhiren/fdr-kg"
+license: MIT
+abstract: "Software and reproducibility materials for conditional false-discovery-rate diagnostics in knowledge-graph link prediction."
+keywords:
+  - knowledge graphs
+  - link prediction
+  - false discovery rate
+  - statistical quality assurance
+  - reproducibility

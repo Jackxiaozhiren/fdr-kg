@@ -1,69 +1,68 @@
 # FDR-KG: Statistical Quality Assurance for Knowledge Graph Link Prediction
 
-This repository hosts the FDR-KG framework and the source material for:
+Companion software and reproducibility materials for:
 
 > **Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction**
 > Zhiren Xiao
-> Submitted to **Expert Systems with Applications (Elsevier)**
-
-## Status note
-
-An earlier version of this study was previously submitted to *Knowledge-Based Systems* (Elsevier) and was not
-accepted; the journal flagged unintentional textual overlap. The manuscript has been systematically rewritten,
-the experimental protocol corrected, and the WN18RR evidence regenerated under a frozen, hash-verified protocol
-before being submitted to ESWA. Historical KBS-era materials are retained under `historical/` for audit only and
-do **not** reflect the current submission.
 
 ## Overview
 
-The FDR-KG framework formulates a **conditional benchmark diagnostic** for knowledge graph (KG) link prediction.
-For each retained test triple it samples $K$ filtered tail corruptions, compares the observed score with the
-sampled score distribution, and derives an empirical $p$-value that measures score extremeness under the declared
-candidate-tail sampling scheme. It then applies the standard largest-$k$ Benjamini–Hochberg rule and Storey's
-fixed-lambda $\hat\pi_0$ estimator as benchmark diagnostics. These quantities describe score behavior under the
-declared conditional scheme; they do not by themselves assert factual truth in a complete KG or provide
-unconditional validity or deployment guarantees.
+FDR-KG is a statistical quality-assurance framework for knowledge-graph link prediction. For each retained test triple, it samples filtered tail corruptions, compares the observed model score with the sampled score distribution, constructs an empirical p-value under the declared candidate-sampling scheme, and applies false-discovery-rate procedures as conditional benchmark diagnostics.
 
-**Accepted evidence (WN18RR, seed 42, 2,924 retained test triples, K=100):**
+These diagnostics characterize model-score behavior under the stated evaluation protocol. They do not establish factual truth in a complete knowledge graph, causal validity, clinical validity, or deployment guarantees.
 
-| Model | Sampled MRR | $\hat\pi_0$ | BH rejections (rate) |
-|---|---|---|---|
-| RotatE | 0.5882 | 0.2510 | 1,751 (59.88%) |
-| ConvE (inverse-triple exception) | 0.5360 | 0.2770 | 1,527 (52.22%) |
-| TransE | 0.5077 | 0.2873 | 1,438 (49.18%) |
-| ComplEx | 0.0709 | 0.7503 | 0 (0.00%) |
+## What this repository contains
 
-Sampled MRR and BH-rate rankings agree, with RotatE leading both. Multi-seed (42, 123, 456) BH-rate sample
-coefficients of variation are 0.54% (TransE), 0.39% (RotatE), and 1.09% (ConvE). Accepted sensitivity covers
-$K \in \{25,50,100\}$ and $\lambda \in \{0.3,0.5,0.7\}$ only. FB15k-237 historical results are not part of the
-accepted evidence and are quarantined.
+- `fdr_kg/` — core Python implementation;
+- `experiments/` — experiment drivers and legacy/public benchmark outputs;
+- `analysis/` — utilities for inspecting released outputs;
+- `requirements.txt` — install requirements;
+- `LICENSE` — MIT license;
+- `CITATION.cff` — software citation metadata;
+- `docs/REPRODUCIBILITY.md` — reproducibility boundary and verification guidance;
+- `docs/DATA_AVAILABILITY.md` — data and artifact availability statement.
 
-## Repository Structure
+## Important evidence boundary
 
-- `fdr_kg/` — Core Python package (empirical p-value construction, BH, Storey, pipeline)
-- `experiments/`, `analysis/` — KBS-era run scripts, configurations, and analysis outputs
-- `historical/` — Superseded KBS-era manuscript and submission package (2026-07-26), kept for audit; contains
-  outdated numbers and must not be treated as the current submission
-- `requirements.txt`, `LICENSE`
+The public files currently under `experiments/results/` are retained benchmark outputs from an earlier public experiment state. They are **not designated as the frozen evidence package for the current manuscript** and should not be used to infer the manuscript's headline values unless a versioned release explicitly identifies them as such.
 
-## Reproducibility
+The manuscript-facing evidence was generated under a separately frozen, hash-verified protocol. Before archival release, the exact manuscript artifact set should be deposited as a versioned release with checksums and a persistent DOI. See `docs/REPRODUCIBILITY.md`.
 
-The numbers in the accepted manuscript were produced from frozen, hash-verified WN18RR artifacts (exports,
-candidate manifests, leakage audits, and the primary-number ledger) recorded in the submission's orchestration
-record. This repository implements the framework, but a generic checkout is **not claimed** to reproduce every
-reported number; exact reproduction requires the frozen protocol, recorded training and candidate seeds, and the
-corresponding verified artifacts.
+## Quick start
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m compileall fdr_kg
+```
+
+For exploratory execution of the public pipeline:
+
+```bash
+python experiments/run_pipeline.py --help
+```
+
+Do not treat a newly generated run as manuscript-identical unless the same dataset snapshot, model artifacts, seeds, candidate-generation protocol, package versions, and configuration recorded for the manuscript are used.
+
+## Reproducibility policy
+
+A manuscript reproduction release should satisfy all of the following before its DOI is cited in the paper:
+
+1. freeze the exact manuscript configuration and random seeds;
+2. include or legally reference every required input artifact;
+3. record cryptographic checksums for all frozen inputs and derived headline outputs;
+4. record the exact Python/package environment used for the manuscript run;
+5. provide one command or documented sequence that regenerates manuscript tables/figures from the frozen artifacts;
+6. verify that regenerated headline values match the manuscript before tagging the release.
 
 ## Citation
 
-```
-@article{xiao2026reliable,
-  title={Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction},
-  author={Xiao, Zhiren},
-  journal={Expert Systems with Applications},
-  year={2026}
-}
-```
+Use GitHub's **Cite this repository** function, generated from `CITATION.cff`, when citing the software repository. After the associated article is formally published, `CITATION.cff` can be updated with a `preferred-citation` entry for the article.
+
+## License
+
+MIT. Third-party datasets, pretrained models, APIs, and other external assets remain subject to their original licenses and terms.
 
 ## Contact
 
