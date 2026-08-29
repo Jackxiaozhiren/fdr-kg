@@ -1,9 +1,13 @@
 # FDR-KG: Statistical Quality Assurance for Knowledge Graph Link Prediction
 
-Companion software and reproducibility materials for:
+> **Project status — historical precursor.** This repository preserves an earlier methodological and manuscript-development route for statistical quality assurance in knowledge-graph link prediction. It is **not** the frozen evidence repository for the current Journal of Biomedical Informatics manuscript. The manuscript-active JBI code, frozen protocol, derived results, and versioned release are maintained at [`Jackxiaozhiren/jbi-biomedical-reliability-screen`](https://github.com/Jackxiaozhiren/jbi-biomedical-reliability-screen), specifically release `v1.0.1` for the final audited submission state.
+
+The earlier working manuscript associated with this repository used the title:
 
 > **Reliable Knowledge Discovery in Knowledge Graphs: A Statistical Quality Assurance Framework for Link Prediction**
 > Zhiren Xiao
+
+That route preceded the later biomedical, externally validated JBI formulation. Historical public experiment outputs remain here for provenance and method development; they must not be cited as the frozen evidence for the JBI paper. See [`docs/PROJECT_LINEAGE.md`](docs/PROJECT_LINEAGE.md).
 
 ## Overview
 
@@ -19,14 +23,21 @@ These diagnostics characterize model-score behavior under the stated evaluation 
 - `requirements.txt` — install requirements;
 - `LICENSE` — MIT license;
 - `CITATION.cff` — software citation metadata;
+- `docs/PROJECT_LINEAGE.md` — relationship to the later JBI-specific research route;
 - `docs/REPRODUCIBILITY.md` — reproducibility boundary and verification guidance;
 - `docs/DATA_AVAILABILITY.md` — data and artifact availability statement.
 
-## Important evidence boundary
+## Evidence boundary
 
-The public files currently under `experiments/results/` are retained benchmark outputs from an earlier public experiment state. They are **not designated as the frozen evidence package for the current manuscript** and should not be used to infer the manuscript's headline values unless a versioned release explicitly identifies them as such.
+The public files currently under `experiments/results/` are retained outputs from an earlier public experiment state. They are **not designated as frozen evidence for the current JBI manuscript** and should not be used to infer its headline values.
 
-The manuscript-facing evidence was generated under a separately frozen, hash-verified protocol. Before archival release, the exact manuscript artifact set should be deposited as a versioned release with checksums and a persistent DOI. See `docs/REPRODUCIBILITY.md`.
+For the final JBI manuscript, use the dedicated repository and versioned release:
+
+- repository: `Jackxiaozhiren/jbi-biomedical-reliability-screen`
+- release: `v1.0.1`
+- manuscript route: *From ranked links to audited decisions: an externally validated reliability screen for knowledge-graph-based drug repurposing*
+
+The JBI repository contains the frozen protocol, manuscript-facing derived result exports, compact external-validation summaries, generated figures, and release checksum manifest. This repository remains useful as a historical software/method-development record rather than as the archival JBI evidence package.
 
 ## Quick start
 
@@ -37,17 +48,17 @@ pip install -r requirements.txt
 python -m compileall fdr_kg
 ```
 
-For exploratory execution of the public pipeline:
+For exploratory execution of the historical/public pipeline:
 
 ```bash
 python experiments/run_pipeline.py --help
 ```
 
-Do not treat a newly generated run as manuscript-identical unless the same dataset snapshot, model artifacts, seeds, candidate-generation protocol, package versions, and configuration recorded for the manuscript are used.
+Do not treat a newly generated run as manuscript-identical unless the same dataset snapshot, model artifacts, seeds, candidate-generation protocol, package versions, and configuration are explicitly frozen and verified.
 
 ## Reproducibility policy
 
-A manuscript reproduction release should satisfy all of the following before its DOI is cited in the paper:
+A manuscript reproduction release should satisfy all of the following before its DOI is cited in a paper:
 
 1. freeze the exact manuscript configuration and random seeds;
 2. include or legally reference every required input artifact;
@@ -56,9 +67,11 @@ A manuscript reproduction release should satisfy all of the following before its
 5. provide one command or documented sequence that regenerates manuscript tables/figures from the frozen artifacts;
 6. verify that regenerated headline values match the manuscript before tagging the release.
 
+The later JBI-specific repository applies this stricter release boundary; this historical repository does not retroactively claim that its legacy outputs satisfy the JBI frozen-evidence standard.
+
 ## Citation
 
-Use GitHub's **Cite this repository** function, generated from `CITATION.cff`, when citing the software repository. After the associated article is formally published, `CITATION.cff` can be updated with a `preferred-citation` entry for the article.
+Use GitHub's **Cite this repository** metadata from `CITATION.cff` only when citing the FDR-KG software itself. For the current JBI study or its numerical results, cite the JBI article and the `jbi-biomedical-reliability-screen` versioned release instead.
 
 ## License
 

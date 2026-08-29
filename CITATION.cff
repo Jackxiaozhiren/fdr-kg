@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use FDR-KG, please cite this software release and, once published, the associated article."
+message: "If you use the historical FDR-KG software itself, please cite this software record. For the current JBI study and its numerical results, cite the JBI article and the versioned jbi-biomedical-reliability-screen release instead."
 title: "FDR-KG: Statistical Quality Assurance for Knowledge Graph Link Prediction"
 type: software
 version: 1.0.0
@@ -9,10 +9,11 @@ authors:
 repository-code: "https://github.com/Jackxiaozhiren/fdr-kg"
 url: "https://github.com/Jackxiaozhiren/fdr-kg"
 license: MIT
-abstract: "Software and reproducibility materials for conditional false-discovery-rate diagnostics in knowledge-graph link prediction."
+abstract: "Historical precursor software for conditional false-discovery-rate diagnostics in knowledge-graph link prediction. This repository is preserved for method-development provenance and is not the frozen evidence repository for the later JBI manuscript."
 keywords:
   - knowledge graphs
   - link prediction
   - false discovery rate
   - statistical quality assurance
   - reproducibility
+  - research provenance
