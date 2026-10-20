@@ -6,6 +6,32 @@ from scipy.stats import gaussian_kde
 from typing import Tuple
 
 
+def _validated_pvalues(p_values: np.ndarray) -> np.ndarray:
+    """Reject invalid p-value vectors before carrying out FDR calculations."""
+    try:
+        values = np.asarray(p_values, dtype=float)
+    except (ValueError, TypeError) as exc:
+        raise ValueError("p_values must be a numeric one-dimensional vector") from exc
+    if values.ndim != 1 or values.size == 0:
+        raise ValueError("p_values must be a non-empty one-dimensional vector")
+    if not np.all(np.isfinite(values)) or np.any((values < 0) | (values > 1)):
+        raise ValueError("p_values must be finite and within [0, 1]")
+    return values
+
+
+def _validated_threshold(name: str, value: float, *, allow_one: bool) -> float:
+    """Validate scalar error-rate and Storey tuning parameters."""
+    try:
+        if np.asarray(value).ndim != 0:
+            raise ValueError
+        threshold = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be a scalar in [0, 1]") from exc
+    if not np.isfinite(threshold) or not (0 <= threshold <= 1 if allow_one else 0 <= threshold < 1):
+        raise ValueError(f"{name} must be within [0, 1]" if allow_one else f"{name} must be within [0, 1)")
+    return threshold
+
+
 def benjamini_hochberg(p_values: np.ndarray, alpha: float = 0.05) -> Tuple[np.ndarray, int]:
     """Apply Benjamini-Hochberg FDR control.
 
@@ -17,6 +43,8 @@ def benjamini_hochberg(p_values: np.ndarray, alpha: float = 0.05) -> Tuple[np.nd
         rejected: Boolean array indicating rejected hypotheses.
         n_rejected: Number of rejected hypotheses.
     """
+    p_values = _validated_pvalues(p_values)
+    alpha = _validated_threshold("alpha", alpha, allow_one=True)
     m = len(p_values)
     sorted_indices = np.argsort(p_values)
     sorted_p = p_values[sorted_indices]
@@ -42,6 +70,8 @@ def benjamini_yekutieli(p_values: np.ndarray, alpha: float = 0.05) -> Tuple[np.n
         rejected: Boolean array indicating rejected hypotheses.
         n_rejected: Number of rejected hypotheses.
     """
+    p_values = _validated_pvalues(p_values)
+    alpha = _validated_threshold("alpha", alpha, allow_one=True)
     m = len(p_values)
     c_m = np.sum(1.0 / np.arange(1, m + 1))
     sorted_indices = np.argsort(p_values)
@@ -67,6 +97,8 @@ def storey_qvalues(p_values: np.ndarray, lambda_param: float = 0.5) -> Tuple[np.
         qvalues: Array of q-values (FDR-adjusted).
         pi0: Estimated null proportion.
     """
+    p_values = _validated_pvalues(p_values)
+    lambda_param = _validated_threshold("lambda_param", lambda_param, allow_one=False)
     m = len(p_values)
     pi0 = np.sum(p_values > lambda_param) / (m * (1 - lambda_param))
     pi0 = min(pi0, 1.0)
@@ -97,6 +129,7 @@ def storey_pi0_spline(p_values: np.ndarray) -> float:
     Returns:
         pi0: Estimated null proportion.
     """
+    p_values = _validated_pvalues(p_values)
     lambdas = np.arange(0.05, 0.95, 0.05)
     m = len(p_values)
     pi0_lambdas = np.array([np.sum(p_values > lam) / (m * (1 - lam)) for lam in lambdas])
