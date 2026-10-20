@@ -12,6 +12,7 @@ from fdr_kg.fdr_methods import (
     benjamini_hochberg,
     benjamini_yekutieli,
     efron_locfdr,
+    storey_pi0_spline,
     storey_qvalues,
 )
 
@@ -70,6 +71,45 @@ class TestFalseDiscoveryRateMethods(unittest.TestCase):
         self.assertEqual(output.shape, z.shape)
         self.assertTrue(np.isfinite(output).all())
         self.assertTrue(np.all((0.0 <= output) & (output <= 1.0)))
+
+    def test_invalid_pvalue_vectors_raise_instead_of_silent_outputs(self):
+        inputs = [
+            np.array([]),
+            np.array([0.1, -0.001]),
+            np.array([0.1, 1.001]),
+            np.array([0.2, np.nan]),
+            np.array([0.2, np.inf]),
+            np.array([[0.1, 0.2]]),
+        ]
+        for method in (benjamini_hochberg, benjamini_yekutieli, storey_qvalues, storey_pi0_spline):
+            for p in inputs:
+                with self.subTest(method=method.__name__, p=repr(p)):
+                    with self.assertRaisesRegex(ValueError, "p_values"):
+                        method(p)
+
+    def test_invalid_alpha_fails_closed(self):
+        for method in (benjamini_hochberg, benjamini_yekutieli):
+            for alpha in (-0.01, 1.01, np.nan, np.inf, [0.05]):
+                with self.subTest(method=method.__name__, alpha=repr(alpha)):
+                    with self.assertRaisesRegex(ValueError, "alpha"):
+                        method(np.array([0.01, 0.5]), alpha=alpha)
+
+    def test_invalid_storey_lambda_fails_closed(self):
+        for bad in (-0.001, 1.0, 1.01, np.inf, np.nan, [0.5]):
+            with self.subTest(lambda_param=repr(bad)):
+                with self.assertRaisesRegex(ValueError, "lambda_param"):
+                    storey_qvalues(np.array([0.01, 0.5]), lambda_param=bad)
+
+    def test_pvalue_boundaries_remain_permitted(self):
+        p = np.array([0.0, 1.0, 0.1])
+        for method in (benjamini_hochberg, benjamini_yekutieli):
+            rejected, count = method(p)
+            self.assertTrue(rejected[0])
+            self.assertFalse(rejected[1])
+            self.assertEqual(count, int(rejected.sum()))
+        for alpha in (0.0, 1.0):
+            rejected, count = benjamini_hochberg(p, alpha)
+            self.assertEqual(count, int(rejected.sum()))
 
 
 if __name__ == "__main__":
