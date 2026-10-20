@@ -9,6 +9,12 @@ The earlier working manuscript associated with this repository used the title:
 
 That route preceded the later biomedical, externally validated JBI formulation. Historical public experiment outputs remain here for provenance and method development; they must not be cited as the frozen evidence for the JBI paper. See [`docs/PROJECT_LINEAGE.md`](docs/PROJECT_LINEAGE.md).
 
+## Reader's guide: historical versus active evidence
+
+- [Project lineage](docs/PROJECT_LINEAGE.md) explains how this historical precursor relates to the later, distinct biomedical study.
+- [Reproducibility](docs/REPRODUCIBILITY.md) and [data availability](docs/DATA_AVAILABILITY.md) describe what can be independently rebuilt and under which terms.
+- The [JBI-specific reliability-screen repository](https://github.com/Jackxiaozhiren/jbi-biomedical-reliability-screen) is the relevant evidence boundary for that later work. **Do not transfer its results or release guarantees to this repository.**
+
 ## Overview
 
 FDR-KG is a statistical quality-assurance framework for knowledge-graph link prediction. For each retained test triple, it samples filtered tail corruptions, compares the observed model score with the sampled score distribution, constructs an empirical p-value under the declared candidate-sampling scheme, and applies false-discovery-rate procedures as conditional benchmark diagnostics.
